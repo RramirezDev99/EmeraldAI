@@ -1,28 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; // Importa los estilos del CSS
+import './App.css'; 
 
-// ELIMINAR ESTA LÍNEA (Usaremos la ruta absoluta /EmraldAI.png)
-// import EmeraldLogo from "./assets/EmraldAI.png";
+// NOTA: La variable VITE_APP_API_URL debe ser configurada en tu .env.development local.
+// En producción (Vercel), será vacío, haciendo el fetch a /api/chat.
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || ''; 
 
-// Definimos la ruta absoluta del logo
-const LOGO_SRC = "/EmraldAI.png";
+// RUTA CRÍTICA: Se asume que el logo fue movido a la carpeta /public de Vercel.
+const LOGO_SRC = "/EmraldAI.png"; 
 
-// Componente Loader con el Logo giratorio
+// Componente Loader con el Logo giratorio (Para el estado isLoading)
 const ChatLoader = () => (
     <div className="message bot message-loader">
         <div className="loader-container">
             <div className="spinner-border"></div>
-            {/* RUTA ABSOLUTA */}
             <img src={LOGO_SRC} alt="Loading" className="loader-logo" />
         </div>
         <p className="typing-indicator">IA: Escribiendo...</p>
     </div>
 );
 
-// Componente para el encabezado fijo
+// Componente para el encabezado fijo (cuando la conversación ha iniciado)
 const ChatHeaderFixed = () => (
     <div className="chat-header-fixed">
-        {/* RUTA ABSOLUTA */}
         <img 
             src={LOGO_SRC}
             alt="EmeraldAI Logo"
@@ -48,8 +47,6 @@ function App() {
   }, [messages, isLoading]);
 
   const sendMessage = async () => {
-    // ... (Tu lógica de sendMessage, que usa fetch(API_URL) ) ...
-
     const userMessageText = input.trim();
     if (!userMessageText) return;
 
@@ -59,7 +56,8 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', { // Asumiendo API_URL = /api/chat
+      // LLAMADA CORREGIDA: Usa API_BASE_URL para determinar la ruta completa (local o producción)
+      const response = await fetch(`${API_BASE_URL}/api/chat`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessageText }),
@@ -77,7 +75,7 @@ function App() {
     } catch (error) {
       console.error("Error en la comunicación:", error);
       setMessages(prev => [...prev, { 
-        text: `⚠️ Error: ${error.message || 'No se pudo conectar.'}`, 
+        text: `⚠️ Error: ${error.message || 'Error de conexión. Revisa el backend.'}`, 
         sender: "system" 
       }]);
     } finally {
@@ -85,6 +83,7 @@ function App() {
     }
   };
 
+  // La pantalla inicial se mantiene si solo tiene el mensaje de bienvenida
   const isInitialScreen = messages.length === 1 && messages[0].sender === 'bot'; 
 
   return (
@@ -99,7 +98,6 @@ function App() {
                 /* PANTALLA INICIAL CENTRADA */
                 <div className="initial-screen">
                     <div className="centered-header">
-                        {/* RUTA ABSOLUTA */}
                         <img 
                             src={LOGO_SRC}
                             alt="EmeraldAI Logo"
@@ -113,6 +111,7 @@ function App() {
                 <div className="chat-area">
                     <div className="chat-messages" ref={chatWindowRef}>
                         {messages.map((msg, index) => {
+                            // Saltar el mensaje inicial de bienvenida cuando hay más mensajes
                             if (index === 0 && msg.sender === 'bot' && messages.length > 1) {
                                 return null;
                             }
