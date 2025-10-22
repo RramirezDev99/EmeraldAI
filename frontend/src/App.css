@@ -1,0 +1,279 @@
+/* EmeraldAI/frontend/src/App.css */
+
+/* --- 0. Variables y Reseteo --- */
+:root {
+    --color-bg-dark: #222222; 
+    --color-panel-dark: #333333; 
+    --color-text-light: #e0e0e0;
+    --color-text-secondary: #999999;
+    --color-highlight: #4a90e2; 
+    --color-emerald-green: #00d47e; 
+    --color-emerald-light: #52ffaa;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-light);
+    display: flex;
+    justify-content: center;
+    /* AUMENTADO: Da espacio en la parte superior del BODY, fuera del contenedor principal */
+    padding-top: 20px; 
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+/* --- 1. Contenedor Principal (Fuerza la altura completa) --- */
+.main-container-desktop {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* AUMENTADO: Hace que el viewport sea más ancho en escritorio */
+    max-width: 1400px; 
+    /* Cambiado a min-height para que crezca si el contenido lo requiere */
+    min-height: calc(100vh - 40px); /* 100vh menos el padding superior/inferior del body */
+    height: auto;
+    box-sizing: border-box;
+    position: relative; 
+}
+
+/* Contenedor flexible para el chat (permite scroll y ajusta el input fijo) */
+.chat-content {
+    width: 100%;
+    /* AUMENTADO: Ancho del contenido de chat */
+    max-width: 900px;
+    margin: 0 auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    
+    /* CORRECCIÓN CLAVE: El historial debe empezar arriba (flex-start) */
+    justify-content: flex-start; 
+    
+    /* Espacio interno para que el primer mensaje no se pegue al tope del área visible */
+    padding-top: 40px; 
+    padding-bottom: 120px; /* Padding inferior reservado para el input fijo */
+    
+    /* Permitimos el scroll en el chat-content */
+    overflow-y: auto; 
+}
+
+/* CLASE CLAVE: Sobreescribe las reglas para CENTRAR el contenido SÓLO en la vista inicial */
+.chat-content.centered-chat-view {
+    overflow-y: hidden; 
+    /* Alineación de centrado vertical total */
+    justify-content: center; 
+    align-items: center; 
+    
+    /* El padding-top se anula al inicio para centrar */
+    padding-top: 0; 
+    /* Sube el contenido central por encima del input */
+    padding-bottom: 250px; 
+    transition: all 0.5s ease-out; 
+}
+
+/* --- 2. Título y Logo Central (Solo se muestra al inicio) --- */
+.centered-header {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+    margin-bottom: 30px; 
+}
+
+.header-logo-large {
+    width: 50px; 
+    height: 50px;
+    margin-bottom: 15px; 
+    border-radius: 6px;
+}
+
+.main-title {
+    color: var(--color-text-light); 
+    font-size: 3rem; 
+    font-weight: 500;
+    margin: 0; 
+}
+
+/* --- 3. Historial de Mensajes y Animaciones --- */
+.chat-window {
+    width: 100%; 
+    /* AUMENTADO el padding lateral para que los mensajes no estén apretados */
+    padding: 0 40px; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    flex-shrink: 0; 
+}
+
+/* Estilos de los mensajes (burbujas) */
+.message {
+    padding: 10px 15px;
+    border-radius: 10px;
+    /* AUMENTADO: Los mensajes se ven más anchos y cómodos */
+    max-width: 85%; 
+    clear: both;
+}
+
+/* MENSAJES DEL USUARIO: VERDE ESMERALDA */
+.message.user {
+    background-color: var(--color-emerald-green); 
+    color: white;
+    margin-left: auto;
+    border-top-right-radius: 4px;
+}
+.message.bot {
+    background-color: var(--color-panel-dark);
+    color: var(--color-text-light);
+    margin-right: auto;
+    border-top-left-radius: 4px;
+}
+
+/* Animación Fade-in y desplazamiento (de abajo hacia arriba) */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-fade-in {
+    animation: fadeInUp 0.4s ease-out forwards;
+    opacity: 0; 
+}
+
+/* --- 4. Loader (Logo giratorio) --- */
+
+.message-loader {
+    background: none !important;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 30px auto;
+    padding: 0;
+    width: 150px;
+}
+
+.loader-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.loader-logo {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 6px;
+    z-index: 2;
+}
+
+.spinner-border {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+    border: 4px solid transparent;
+    border-top-color: var(--color-emerald-green);
+    border-right-color: var(--color-emerald-light);
+    animation: spin 1s linear infinite;
+    z-index: 1;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.typing-indicator {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+
+/* --- 5. Área de Input (Fija abajo) --- */
+.input-area-gemini {
+    width: 100%;
+    /* AUMENTADO: Ancho del input para que coincida con el contenido */
+    max-width: 900px; 
+    margin: 0 auto;
+    padding: 20px 0 40px; 
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    
+    /* Fija el input al fondo de la vista */
+    position: fixed; 
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    background-color: var(--color-bg-dark); 
+    z-index: 30;
+}
+
+.input-field-wrapper {
+    background-color: var(--color-panel-dark);
+    border-radius: 16px; 
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+}
+
+.input-field-wrapper input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text-light);
+    font-size: 1.05rem;
+    padding: 5px 10px;
+}
+
+.send-button {
+    background-color: var(--color-emerald-green); 
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px; 
+    transition: background-color 0.2s;
+    height: 35px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.send-button:hover:not(:disabled) {
+    background-color: #00b368; 
+}
+.send-button:disabled {
+    background-color: #555555;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 768px) {
+    .main-container-desktop {
+        padding: 0 10px;
+    }
+    .input-area-gemini {
+        max-width: 95%;
+    }
+}
